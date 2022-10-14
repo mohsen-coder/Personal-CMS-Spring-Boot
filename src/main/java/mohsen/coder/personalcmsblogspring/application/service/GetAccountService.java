@@ -1,11 +1,13 @@
 package mohsen.coder.personalcmsblogspring.application.service;
 
+import lombok.extern.slf4j.Slf4j;
 import mohsen.coder.personalcmsblogspring.application.port.in.GetAccountUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.out.GetAccountPort;
 import mohsen.coder.personalcmsblogspring.domain.Account;
 import mohsen.coder.personalcmsblogspring.errors.NotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class GetAccountService implements GetAccountUseCase {
 
@@ -49,9 +52,12 @@ public class GetAccountService implements GetAccountUseCase {
     public ResponseEntity<Collection<Account>> getAccountsByRole(String role, int skip, int limit){
         Pageable pageable = PageRequest.of(skip, limit);
         Collection<Account> accountsByRole = repo.getAccountsByRole(role, pageable);
-        if (accountsByRole.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(accountsByRole, new HttpHeaders(), HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(accountsByRole, HttpStatus.OK);
+    public ResponseEntity<Collection<Account>> getAccountsByPagination(int skip, int limit){
+        Pageable pageable = PageRequest.of(skip, limit);
+        Collection<Account> accounts = repo.getAllAccountsByPagination(pageable);
+        return new ResponseEntity<>(accounts, new HttpHeaders(), HttpStatus.OK);
     }
 }
