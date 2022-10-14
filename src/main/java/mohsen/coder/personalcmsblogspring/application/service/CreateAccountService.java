@@ -1,0 +1,30 @@
+package mohsen.coder.personalcmsblogspring.application.service;
+
+import mohsen.coder.personalcmsblogspring.application.port.in.CreateAccountUseCase;
+import mohsen.coder.personalcmsblogspring.application.port.out.CreateAccountPort;
+import mohsen.coder.personalcmsblogspring.domain.Account;
+import mohsen.coder.personalcmsblogspring.errors.ConflictException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CreateAccountService implements CreateAccountUseCase {
+
+    private final CreateAccountPort repo;
+
+    @Autowired
+    public CreateAccountService(CreateAccountPort repo) {
+        this.repo = repo;
+    }
+
+    @Override
+    public ResponseEntity<Account> createAccount(Account account) throws ConflictException {
+        var createdAccount = repo.createAccount(account);
+        if (createdAccount.isEmpty())
+            throw new ConflictException("کاربر موجود می باشد!");
+        return new ResponseEntity<>(createdAccount.get(), HttpStatus.CREATED);
+    }
+
+}
