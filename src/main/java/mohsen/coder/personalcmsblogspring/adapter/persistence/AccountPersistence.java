@@ -50,17 +50,19 @@ public class AccountPersistence implements CreateAccountPort, GetAccountPort, Up
 
     @Override
     public Optional<Account> getAccountByEmail(String email) {
-        return Optional.empty();
+        Optional<AccountEntity> accountByUsername = repo.findAccountEntityByEmail(email);
+        return accountByUsername.map(AccountEntity::toDomainModel);
     }
 
     @Override
     public Optional<Account> getAccountByUsername(String username) {
-        return Optional.empty();
+        Optional<AccountEntity> accountByUsername = repo.findAccountEntityByUsername(username);
+        return accountByUsername.map(AccountEntity::toDomainModel);
     }
 
     @Override
     public Collection<Account> getAllAccountsByPagination(Pageable pageable) {
-        return null;
+        return repo.findAll(pageable).map(AccountEntity::toDomainModel).stream().collect(Collectors.toList());
     }
 
     @Override
