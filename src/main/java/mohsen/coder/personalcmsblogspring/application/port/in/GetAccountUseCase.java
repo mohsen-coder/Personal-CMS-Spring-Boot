@@ -14,4 +14,6 @@ public interface GetAccountUseCase {
     ResponseEntity<Account> getAccountByEmail(String email) throws NotFoundException;
 
     ResponseEntity<Collection<Account>> getAccountsByRole(String role, int skip, int limit);
+
+    ResponseEntity<Collection<Account>> getAccountsByPagination(int skip, int limit);
 }
