@@ -30,7 +30,7 @@ public class GetAccountService implements GetAccountUseCase {
         if (account.isEmpty())
             throw new NotFoundException("کاربر یافت نشد!");
 
-        return new ResponseEntity<>(account.get(), HttpStatus.OK);
+        return new ResponseEntity<>(account.get(), new HttpHeaders(), HttpStatus.OK);
     }
 
     public ResponseEntity<Account> getAccountByUsername(String username) throws NotFoundException {
@@ -38,7 +38,7 @@ public class GetAccountService implements GetAccountUseCase {
         if (account.isEmpty())
             throw new NotFoundException("کاربر یافت نشد!");
 
-        return new ResponseEntity<>(account.get(), HttpStatus.OK);
+        return new ResponseEntity<>(account.get(), new HttpHeaders(), HttpStatus.OK);
     }
 
     public ResponseEntity<Account> getAccountByEmail(String email) throws NotFoundException {
@@ -46,7 +46,7 @@ public class GetAccountService implements GetAccountUseCase {
         if (account.isEmpty())
             throw new NotFoundException("کاربر یافت نشد!");
 
-        return new ResponseEntity<>(account.get(), HttpStatus.OK);
+        return new ResponseEntity<>(account.get(), new HttpHeaders(), HttpStatus.OK);
     }
 
     public ResponseEntity<Collection<Account>> getAccountsByRole(String role, int skip, int limit){
