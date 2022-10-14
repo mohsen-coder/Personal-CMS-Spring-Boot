@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public class InvalidFieldException extends Exception {
-    private List<Map<String, String>> fields;
+    private final List<Map<String, String>> fields;
 
     public InvalidFieldException(List<Map<String, String>> fields) {
         this.fields = fields;
