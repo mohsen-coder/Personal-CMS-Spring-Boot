@@ -48,16 +48,28 @@ public class AccountController {
         return createAccountUseCase.createAccount(requestModel.mapToAccountDomainModel());
     }
 
-    @GetMapping(params = {"role", "skip", "limit"})
-    public ResponseEntity<Collection<Account>> getAccountsByRole(@RequestParam String role, @RequestParam Optional<Integer> skip, @RequestParam int limit) {
-        return getAccountUseCase.getAccountsByRole(role, skip.orElse(0), limit);
+    @GetMapping(params = {"id"})
+    public ResponseEntity<Account> getAccountById(@RequestParam String id) throws NotFoundException {
+        return getAccountUseCase.getAccountById(id);
     }
-
 
     @GetMapping(params = {"username"})
     public ResponseEntity<Account> getAccountByUsername(@RequestParam String username) throws NotFoundException {
         return getAccountUseCase.getAccountByUsername(username);
     }
 
+    @GetMapping(params = {"email"})
+    public ResponseEntity<Account> getAccountByEmail(@RequestParam String email) throws NotFoundException {
+        return getAccountUseCase.getAccountByEmail(email);
+    }
 
+    @GetMapping(params = {"role", "skip", "limit"})
+    public ResponseEntity<Collection<Account>> getAccountsByRole(@RequestParam String role, @RequestParam Optional<Integer> skip, @RequestParam int limit) {
+        return getAccountUseCase.getAccountsByRole(role, skip.orElse(0), limit);
+    }
+
+    @GetMapping(params = {"skip", "limit"})
+    public ResponseEntity<Collection<Account>> getAllAccountsByPagination( @RequestParam Optional<Integer> skip, @RequestParam int limit) {
+        return getAccountUseCase.getAccountsByPagination(skip.orElse(0), limit);
+    }
 }
