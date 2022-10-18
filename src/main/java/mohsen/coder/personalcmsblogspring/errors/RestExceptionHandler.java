@@ -20,14 +20,14 @@ import java.util.Map;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UnsatisfiedServletRequestParameterException.class)
-    protected ResponseEntity<Object> handleUnsatisfiedServletRequestParameterException(UnsatisfiedServletRequestParameterException ex){
+    protected ResponseEntity<Object> handleUnsatisfiedServletRequestParameterException(UnsatisfiedServletRequestParameterException ex) {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
         StringBuilder errorMessage = new StringBuilder("داده (های) دریافتی صحیح نمی باشد. داده دریافتی باید شامل ");
         List<String[]> paramConditionGroups = ex.getParamConditionGroups();
 
-        for (int i = 0; i < paramConditionGroups.size(); i++){
+        for (int i = 0; i < paramConditionGroups.size(); i++) {
             errorMessage.append(Arrays.toString(paramConditionGroups.get(i)));
-            if (i + 1 < paramConditionGroups.size()){
+            if (i + 1 < paramConditionGroups.size()) {
                 errorMessage.append(" یا ");
             }
         }
@@ -61,10 +61,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(InvalidFieldException.class)
-    protected ResponseEntity<Object> handleInvalidFieldException(InvalidFieldException ex){
+    protected ResponseEntity<Object> handleInvalidFieldException(InvalidFieldException ex) {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.addAllMessages(ex.getGlobalFieldsErrors());
 
-        for (Map<String, String> field : ex.getFields()){
+        for (Map<String, String> field : ex.getFields()) {
             String key = (String) field.keySet().toArray()[0];
             String value = field.get(key);
             apiError.addMessage(" خطا در فیلد " + key + " : " + value);
@@ -74,14 +75,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ConflictException.class)
-    protected ResponseEntity<Object> handleConflictException(ConflictException ex){
+    protected ResponseEntity<Object> handleConflictException(ConflictException ex) {
         ApiError apiError = new ApiError(HttpStatus.CONFLICT);
         apiError.addMessage(ex.getMessage());
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(NotFoundException.class)
-    protected ResponseEntity<Object> handleNotFoundException(NotFoundException ex){
+    protected ResponseEntity<Object> handleNotFoundException(NotFoundException ex) {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.addMessage(ex.getMessage());
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);
