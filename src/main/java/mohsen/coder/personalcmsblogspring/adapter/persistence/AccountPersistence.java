@@ -3,6 +3,7 @@ package mohsen.coder.personalcmsblogspring.adapter.persistence;
 import lombok.extern.slf4j.Slf4j;
 import mohsen.coder.personalcmsblogspring.adapter.persistence.model.AccountEntity;
 import mohsen.coder.personalcmsblogspring.application.port.out.CreateAccountPort;
+import mohsen.coder.personalcmsblogspring.application.port.out.DeleteAccountPort;
 import mohsen.coder.personalcmsblogspring.application.port.out.GetAccountPort;
 import mohsen.coder.personalcmsblogspring.application.port.out.UpdateAccountPort;
 import mohsen.coder.personalcmsblogspring.domain.Account;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class AccountPersistence implements CreateAccountPort, GetAccountPort, UpdateAccountPort {
+public class AccountPersistence implements CreateAccountPort, GetAccountPort, UpdateAccountPort, DeleteAccountPort {
 
     private final AccountRepo repo;
 
@@ -85,5 +86,15 @@ public class AccountPersistence implements CreateAccountPort, GetAccountPort, Up
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public boolean deleteAccount(String accountPublicId) {
+        Optional<AccountEntity> optionalAccount = repo.findAccountEntityByPublicId(accountPublicId);
+        if (optionalAccount.isPresent()){
+            repo.delete(optionalAccount.get());
+            return true;
+        }
+        return false;
     }
 }
