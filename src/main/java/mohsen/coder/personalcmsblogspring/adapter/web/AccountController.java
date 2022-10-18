@@ -2,9 +2,13 @@ package mohsen.coder.personalcmsblogspring.adapter.web;
 
 import lombok.extern.slf4j.Slf4j;
 
+import mohsen.coder.personalcmsblogspring.adapter.web.response.AccountResponseModel;
 import mohsen.coder.personalcmsblogspring.adapter.web.request.RegisterRequestModel;
+import mohsen.coder.personalcmsblogspring.adapter.web.request.UpdateAccountRequestModel;
 import mohsen.coder.personalcmsblogspring.application.port.in.CreateAccountUseCase;
+import mohsen.coder.personalcmsblogspring.application.port.in.DeleteAccountUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.in.GetAccountUseCase;
+import mohsen.coder.personalcmsblogspring.application.port.in.UpdateAccountUseCase;
 import mohsen.coder.personalcmsblogspring.domain.Account;
 import mohsen.coder.personalcmsblogspring.errors.ConflictException;
 import mohsen.coder.personalcmsblogspring.errors.InvalidFieldException;
@@ -24,28 +28,15 @@ public class AccountController {
 
     private final CreateAccountUseCase createAccountUseCase;
     private final GetAccountUseCase getAccountUseCase;
+    private final UpdateAccountUseCase updateAccountUseCase;
+    private final DeleteAccountUseCase deleteAccountUseCase;
 
     @Autowired
-    public AccountController(CreateAccountUseCase createAccountUseCase, GetAccountUseCase getAccountUseCase) {
+    public AccountController(CreateAccountUseCase createAccountUseCase, GetAccountUseCase getAccountUseCase, UpdateAccountUseCase updateAccountUseCase, DeleteAccountUseCase deleteAccountUseCase) {
         this.createAccountUseCase = createAccountUseCase;
         this.getAccountUseCase = getAccountUseCase;
-    }
-
-    @PostMapping(consumes = "application/json")
-    public ResponseEntity<Account> registerUser(@Valid @RequestBody RegisterRequestModel requestModel, Errors errors) throws InvalidFieldException, ConflictException {
-        if (requestModel.getPassword() != null && requestModel.getConfirmPassword() != null && !requestModel.getPassword().equals(requestModel.getConfirmPassword()))
-            errors.rejectValue("confirmPassword", "confirmPassword", "confirm password don't match!");
-
-        if (errors.hasErrors()) {
-            List<Map<String, String>> errorFields = new ArrayList<>();
-            for (var error : errors.getFieldErrors()) {
-                errorFields.add(Map.of(error.getField(), error.getDefaultMessage() != null ? error.getDefaultMessage() : ""));
-            }
-            log.info("throw InvalidFieldException");
-            throw new InvalidFieldException(errorFields);
-        }
-
-        return createAccountUseCase.createAccount(requestModel.mapToAccountDomainModel());
+        this.updateAccountUseCase = updateAccountUseCase;
+        this.deleteAccountUseCase = deleteAccountUseCase;
     }
 
     @GetMapping(params = {"id"})
@@ -71,5 +62,43 @@ public class AccountController {
     @GetMapping(params = {"skip", "limit"})
     public ResponseEntity<Collection<Account>> getAllAccountsByPagination(@RequestParam Optional<Integer> skip, @RequestParam int limit) {
         return getAccountUseCase.getAccountsByPagination(skip.orElse(0), limit);
+    }
+
+    private void requestValidation(Errors errors) throws InvalidFieldException {
+        if (errors.hasErrors()) {
+            List<Map<String, String>> errorFields = new ArrayList<>();
+            ArrayList<String> globalErrors = new ArrayList<>();
+
+            for (var error : errors.getGlobalErrors()){
+                globalErrors.add(error.getDefaultMessage());
+            }
+
+            for (var error : errors.getFieldErrors()) {
+                errorFields.add(Map.of(error.getField(), error.getDefaultMessage() != null ? error.getDefaultMessage() : ""));
+            }
+
+            throw new InvalidFieldException(errorFields, globalErrors);
+        }
+    }
+
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<Account> registerUser(@Valid @RequestBody RegisterRequestModel requestModel, Errors errors) throws InvalidFieldException, ConflictException {
+        if (errors.hasErrors()) {
+            requestValidation(errors);
+        }
+        return createAccountUseCase.createAccount(requestModel.mapToAccountDomainModel());
+    }
+
+    @PutMapping(consumes = "application/json")
+    public ResponseEntity<AccountResponseModel> updateAccount(@Valid @RequestBody UpdateAccountRequestModel accountModel, Errors errors) throws InvalidFieldException, NotFoundException {
+        if (errors.hasErrors()) {
+            requestValidation(errors);
+        }
+        return updateAccountUseCase.updateAccount(accountModel.mapToAccountDomainModel());
+    }
+
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity<Object> deleteAccount(@PathVariable("accountId") String accountId){
+        return deleteAccountUseCase.deleteAccount(accountId);
     }
 }
