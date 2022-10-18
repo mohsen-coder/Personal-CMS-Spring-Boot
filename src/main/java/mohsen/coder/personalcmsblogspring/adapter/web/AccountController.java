@@ -39,7 +39,7 @@ public class AccountController {
         if (errors.hasErrors()) {
             List<Map<String, String>> errorFields = new ArrayList<>();
             for (var error : errors.getFieldErrors()) {
-                errorFields.add(Map.of(error.getField(), error.getDefaultMessage()));
+                errorFields.add(Map.of(error.getField(), error.getDefaultMessage() != null ? error.getDefaultMessage() : ""));
             }
             log.info("throw InvalidFieldException");
             throw new InvalidFieldException(errorFields);
@@ -69,7 +69,7 @@ public class AccountController {
     }
 
     @GetMapping(params = {"skip", "limit"})
-    public ResponseEntity<Collection<Account>> getAllAccountsByPagination( @RequestParam Optional<Integer> skip, @RequestParam int limit) {
+    public ResponseEntity<Collection<Account>> getAllAccountsByPagination(@RequestParam Optional<Integer> skip, @RequestParam int limit) {
         return getAccountUseCase.getAccountsByPagination(skip.orElse(0), limit);
     }
 }
