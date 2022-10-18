@@ -7,7 +7,15 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+
 @Data
+@FieldsValueMatch.List({
+        @FieldsValueMatch(
+                message = "confirm password is wrong!",
+                field = "password",
+                fieldMatch = "confirmPassword"
+        )
+})
 public class RegisterRequestModel {
     @NotNull(message = "name can't be null!")
     @Size(message = "name must be at least 3 characters long!")
@@ -28,7 +36,7 @@ public class RegisterRequestModel {
     @Size(message = "confirm password must be at least 8 characters long!")
     private String confirmPassword;
 
-    public Account mapToAccountDomainModel(){
+    public Account mapToAccountDomainModel() {
         Account account = new Account();
         account.setName(name);
         account.setLastName(lastName);
