@@ -1,6 +1,6 @@
 package mohsen.coder.personalcmsblogspring.application.service;
 
-import lombok.extern.slf4j.Slf4j;
+import mohsen.coder.personalcmsblogspring.adapter.web.model.AccountModel;
 import mohsen.coder.personalcmsblogspring.application.port.in.GetAccountUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.out.GetAccountPort;
 import mohsen.coder.personalcmsblogspring.domain.Account;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class GetAccountService implements GetAccountUseCase {
 
@@ -25,39 +25,54 @@ public class GetAccountService implements GetAccountUseCase {
         this.repo = repo;
     }
 
-    public ResponseEntity<Account> getAccountById(String id) throws NotFoundException {
+    public ResponseEntity<AccountModel> getAccountById(String id) throws NotFoundException {
         Optional<Account> account = repo.getAccountById(id);
         if (account.isEmpty())
             throw new NotFoundException("کاربر یافت نشد!");
-
-        return new ResponseEntity<>(account.get(), new HttpHeaders(), HttpStatus.OK);
+        var accountModel = new AccountModel();
+        accountModel.fromDomainModel(account.get());
+        return new ResponseEntity<>(accountModel, new HttpHeaders(), HttpStatus.OK);
     }
 
-    public ResponseEntity<Account> getAccountByUsername(String username) throws NotFoundException {
+    public ResponseEntity<AccountModel> getAccountByUsername(String username) throws NotFoundException {
         Optional<Account> account = repo.getAccountByUsername(username);
         if (account.isEmpty())
             throw new NotFoundException("کاربر یافت نشد!");
 
-        return new ResponseEntity<>(account.get(), new HttpHeaders(), HttpStatus.OK);
+        var accountModel = new AccountModel();
+        accountModel.fromDomainModel(account.get());
+        return new ResponseEntity<>(accountModel, new HttpHeaders(), HttpStatus.OK);
     }
 
-    public ResponseEntity<Account> getAccountByEmail(String email) throws NotFoundException {
+    public ResponseEntity<AccountModel> getAccountByEmail(String email) throws NotFoundException {
         Optional<Account> account = repo.getAccountByEmail(email);
         if (account.isEmpty())
             throw new NotFoundException("کاربر یافت نشد!");
 
-        return new ResponseEntity<>(account.get(), new HttpHeaders(), HttpStatus.OK);
+        var accountModel = new AccountModel();
+        accountModel.fromDomainModel(account.get());
+        return new ResponseEntity<>(accountModel, new HttpHeaders(), HttpStatus.OK);
     }
 
-    public ResponseEntity<Collection<Account>> getAccountsByRole(String role, int skip, int limit){
+    public ResponseEntity<Collection<AccountModel>> getAccountsByRole(String role, int skip, int limit) {
         Pageable pageable = PageRequest.of(skip, limit);
         Collection<Account> accountsByRole = repo.getAccountsByRole(role, pageable);
-        return new ResponseEntity<>(accountsByRole, new HttpHeaders(), HttpStatus.OK);
+        var mappedAccounts = accountsByRole.stream().map(accountArg -> {
+            var accountModel = new AccountModel();
+            accountModel.fromDomainModel(accountArg);
+            return accountModel;
+        }).collect(Collectors.toList());
+        return new ResponseEntity<>(mappedAccounts, new HttpHeaders(), HttpStatus.OK);
     }
 
-    public ResponseEntity<Collection<Account>> getAccountsByPagination(int skip, int limit){
+    public ResponseEntity<Collection<AccountModel>> getAccountsByPagination(int skip, int limit) {
         Pageable pageable = PageRequest.of(skip, limit);
         Collection<Account> accounts = repo.getAllAccountsByPagination(pageable);
-        return new ResponseEntity<>(accounts, new HttpHeaders(), HttpStatus.OK);
+        var mappedAccounts = accounts.stream().map(accountArg -> {
+            var accountModel = new AccountModel();
+            accountModel.fromDomainModel(accountArg);
+            return accountModel;
+        }).collect(Collectors.toList());
+        return new ResponseEntity<>(mappedAccounts, new HttpHeaders(), HttpStatus.OK);
     }
 }
