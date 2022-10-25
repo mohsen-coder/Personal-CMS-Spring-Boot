@@ -9,7 +9,7 @@ import java.util.Collection;
 public interface GetCategoryUseCase {
     ResponseEntity<CategoryModel> getCategoryById(String id) throws NotFoundException;
 
-    ResponseEntity<CategoryModel> getCategoryByTitle(String id) throws NotFoundException;
+    ResponseEntity<CategoryModel> getCategoryByTitle(String title) throws NotFoundException;
 
     ResponseEntity<Collection<CategoryModel>> getAllCategories(String status, int skip, int limit);
 }
