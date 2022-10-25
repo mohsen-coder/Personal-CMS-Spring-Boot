@@ -2,14 +2,13 @@ package mohsen.coder.personalcmsblogspring.adapter.web;
 
 import lombok.extern.slf4j.Slf4j;
 
-import mohsen.coder.personalcmsblogspring.adapter.web.response.AccountResponseModel;
+import mohsen.coder.personalcmsblogspring.adapter.web.model.AccountModel;
 import mohsen.coder.personalcmsblogspring.adapter.web.request.RegisterRequestModel;
 import mohsen.coder.personalcmsblogspring.adapter.web.request.UpdateAccountRequestModel;
 import mohsen.coder.personalcmsblogspring.application.port.in.CreateAccountUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.in.DeleteAccountUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.in.GetAccountUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.in.UpdateAccountUseCase;
-import mohsen.coder.personalcmsblogspring.domain.Account;
 import mohsen.coder.personalcmsblogspring.errors.ConflictException;
 import mohsen.coder.personalcmsblogspring.errors.InvalidFieldException;
 import mohsen.coder.personalcmsblogspring.errors.NotFoundException;
@@ -40,27 +39,27 @@ public class AccountController {
     }
 
     @GetMapping(params = {"id"})
-    public ResponseEntity<Account> getAccountById(@RequestParam String id) throws NotFoundException {
+    public ResponseEntity<AccountModel> getAccountById(@RequestParam String id) throws NotFoundException {
         return getAccountUseCase.getAccountById(id);
     }
 
     @GetMapping(params = {"username"})
-    public ResponseEntity<Account> getAccountByUsername(@RequestParam String username) throws NotFoundException {
+    public ResponseEntity<AccountModel> getAccountByUsername(@RequestParam String username) throws NotFoundException {
         return getAccountUseCase.getAccountByUsername(username);
     }
 
     @GetMapping(params = {"email"})
-    public ResponseEntity<Account> getAccountByEmail(@RequestParam String email) throws NotFoundException {
+    public ResponseEntity<AccountModel> getAccountByEmail(@RequestParam String email) throws NotFoundException {
         return getAccountUseCase.getAccountByEmail(email);
     }
 
     @GetMapping(params = {"role", "skip", "limit"})
-    public ResponseEntity<Collection<Account>> getAccountsByRole(@RequestParam String role, @RequestParam Optional<Integer> skip, @RequestParam int limit) {
+    public ResponseEntity<Collection<AccountModel>> getAccountsByRole(@RequestParam String role, @RequestParam Optional<Integer> skip, @RequestParam int limit) {
         return getAccountUseCase.getAccountsByRole(role, skip.orElse(0), limit);
     }
 
     @GetMapping(params = {"skip", "limit"})
-    public ResponseEntity<Collection<Account>> getAllAccountsByPagination(@RequestParam Optional<Integer> skip, @RequestParam int limit) {
+    public ResponseEntity<Collection<AccountModel>> getAllAccountsByPagination(@RequestParam Optional<Integer> skip, @RequestParam int limit) {
         return getAccountUseCase.getAccountsByPagination(skip.orElse(0), limit);
     }
 
@@ -82,7 +81,7 @@ public class AccountController {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Account> registerUser(@Valid @RequestBody RegisterRequestModel requestModel, Errors errors) throws InvalidFieldException, ConflictException {
+    public ResponseEntity<AccountModel> registerUser(@Valid @RequestBody RegisterRequestModel requestModel, Errors errors) throws InvalidFieldException, ConflictException {
         if (errors.hasErrors()) {
             requestValidation(errors);
         }
@@ -90,7 +89,7 @@ public class AccountController {
     }
 
     @PutMapping(consumes = "application/json")
-    public ResponseEntity<AccountResponseModel> updateAccount(@Valid @RequestBody UpdateAccountRequestModel accountModel, Errors errors) throws InvalidFieldException, NotFoundException {
+    public ResponseEntity<AccountModel> updateAccount(@Valid @RequestBody UpdateAccountRequestModel accountModel, Errors errors) throws InvalidFieldException, NotFoundException {
         if (errors.hasErrors()) {
             requestValidation(errors);
         }

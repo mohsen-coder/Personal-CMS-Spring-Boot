@@ -1,6 +1,6 @@
 package mohsen.coder.personalcmsblogspring.application.service;
 
-import mohsen.coder.personalcmsblogspring.adapter.web.response.AccountResponseModel;
+import mohsen.coder.personalcmsblogspring.adapter.web.model.AccountModel;
 import mohsen.coder.personalcmsblogspring.application.port.in.UpdateAccountUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.out.GetAccountPort;
 import mohsen.coder.personalcmsblogspring.application.port.out.UpdateAccountPort;
@@ -24,7 +24,7 @@ public class UpdateAccountService implements UpdateAccountUseCase {
     }
 
     @Override
-    public ResponseEntity<AccountResponseModel> updateAccount(Account accountArg) throws NotFoundException {
+    public ResponseEntity<AccountModel> updateAccount(Account accountArg) throws NotFoundException {
         Optional<Account> optionalAccount = getAccountPort.getAccountById(accountArg.getId());
         if (optionalAccount.isEmpty()) {
             throw new NotFoundException("کاربر موجود نمی باشد!");
@@ -40,9 +40,9 @@ public class UpdateAccountService implements UpdateAccountUseCase {
 
         Optional<Account> updatedAccount = repo.updateAccount(account);
 
-        AccountResponseModel accountRequestModel = new AccountResponseModel();
-        accountRequestModel.mapFromDomainModel(updatedAccount.get());
+        var accountModel = new AccountModel();
+        accountModel.fromDomainModel(updatedAccount.get());
 
-        return new ResponseEntity<>(accountRequestModel, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(accountModel, new HttpHeaders(), HttpStatus.OK);
     }
 }
