@@ -6,9 +6,11 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import lombok.Data;
 import mohsen.coder.personalcmsblogspring.domain.Category;
 import mohsen.coder.personalcmsblogspring.domain.CategoryStatus;
 
+@Data
 public class CategoryModel {
     private String id;
 
