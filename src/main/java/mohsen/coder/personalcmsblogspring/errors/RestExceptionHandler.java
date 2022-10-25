@@ -87,4 +87,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.addMessage(ex.getMessage());
         return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(UpdateItemException.class)
+    protected ResponseEntity<Object> handleUpdateItemException(UpdateItemException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_MODIFIED);
+        apiError.addMessage(ex.getMessage());
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.NOT_MODIFIED);
+    }
+
+    @ExceptionHandler(DeleteItemException.class)
+    protected ResponseEntity<Object> handleDeleteItemException(DeleteItemException ex) {
+        ApiError apiError = new ApiError(HttpStatus.NOT_MODIFIED);
+        apiError.addMessage(ex.getMessage());
+        return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
+
+
