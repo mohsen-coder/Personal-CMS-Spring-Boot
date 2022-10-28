@@ -35,14 +35,21 @@ public class CategoryPersistence implements CreateCategoryPort, UpdateCategoryPo
         try {
             repo.save(categoryEntity);
             return Optional.of(category);
-        }catch (Exception e){
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
 
     @Override
     public boolean deleteCategory(String publicId) {
-        return repo.deleteCategoryEntityByPublicId(publicId);
+        try {
+            var optionalCategory = repo.findCategoryEntityByPublicId(publicId);
+            if (optionalCategory.isEmpty()) return false;
+            repo.delete(optionalCategory.get());
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -66,13 +73,13 @@ public class CategoryPersistence implements CreateCategoryPort, UpdateCategoryPo
     @Override
     public Optional<Category> updateCategory(Category category) {
         Optional<CategoryEntity> optionalCategoryEntity = repo.findCategoryEntityByPublicId(category.getId());
-        if (optionalCategoryEntity.isPresent()){
+        if (optionalCategoryEntity.isPresent()) {
             var categoryEntity = optionalCategoryEntity.get();
             categoryEntity.fromDomainModel(category);
-            try{
+            try {
                 repo.save(categoryEntity);
                 return Optional.of(category);
-            }catch (Exception e){
+            } catch (Exception e) {
                 return Optional.empty();
             }
         }
