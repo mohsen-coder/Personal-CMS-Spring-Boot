@@ -4,9 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import mohsen.coder.personalcmsblogspring.adapter.web.model.CategoryModel;
 import mohsen.coder.personalcmsblogspring.application.port.in.CreateCategoryUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.in.GetCategoryUseCase;
+import mohsen.coder.personalcmsblogspring.application.port.in.UpdateCategoryUseCase;
 import mohsen.coder.personalcmsblogspring.errors.ConflictException;
 import mohsen.coder.personalcmsblogspring.errors.InvalidFieldException;
 import mohsen.coder.personalcmsblogspring.errors.NotFoundException;
+import mohsen.coder.personalcmsblogspring.errors.UpdateItemException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -26,10 +28,12 @@ public class CategoryController {
 
     private final CreateCategoryUseCase createCategoryUseCase;
     private final GetCategoryUseCase getCategoryUseCase;
+    private final UpdateCategoryUseCase updateCategoryUseCase;
 
-    public CategoryController(CreateCategoryUseCase createCategoryUseCase, GetCategoryUseCase getCategoryUseCase) {
+    public CategoryController(CreateCategoryUseCase createCategoryUseCase, GetCategoryUseCase getCategoryUseCase, UpdateCategoryUseCase updateCategoryUseCase) {
         this.createCategoryUseCase = createCategoryUseCase;
         this.getCategoryUseCase = getCategoryUseCase;
+        this.updateCategoryUseCase = updateCategoryUseCase;
     }
 
     private void requestValidation(Errors errors) throws InvalidFieldException {
@@ -77,6 +81,19 @@ public class CategoryController {
         }
 
         return createCategoryUseCase.createCategory(request.toDomainModel());
+    }
+
+    @PutMapping(consumes = "application/json")
+    public ResponseEntity<CategoryModel> updateCategory(@Valid @RequestBody CategoryModel request, Errors errors) throws NotFoundException, UpdateItemException, InvalidFieldException{
+        if(request.getId() == null || request.getId().isEmpty()){
+            errors.rejectValue("id", "id", "id is required");
+        }
+
+        if(errors.hasErrors()){
+            requestValidation(errors);
+        }
+
+        return updateCategoryUseCase.updateCategory(request.toDomainModel());
     }
 
 }
