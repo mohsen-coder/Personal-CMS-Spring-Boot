@@ -13,6 +13,4 @@ public interface CategoryRepo extends PagingAndSortingRepository<CategoryEntity,
     Optional<CategoryEntity> findCategoryEntityByTitle(String title);
 
     List<CategoryEntity> findAllByStatus(String status, Pageable pageable);
-
-    boolean deleteCategoryEntityByPublicId(String publicId);
 }
