@@ -3,9 +3,11 @@ package mohsen.coder.personalcmsblogspring.adapter.web;
 import lombok.extern.slf4j.Slf4j;
 import mohsen.coder.personalcmsblogspring.adapter.web.model.CategoryModel;
 import mohsen.coder.personalcmsblogspring.application.port.in.CreateCategoryUseCase;
+import mohsen.coder.personalcmsblogspring.application.port.in.DeleteCategoryUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.in.GetCategoryUseCase;
 import mohsen.coder.personalcmsblogspring.application.port.in.UpdateCategoryUseCase;
 import mohsen.coder.personalcmsblogspring.errors.ConflictException;
+import mohsen.coder.personalcmsblogspring.errors.DeleteItemException;
 import mohsen.coder.personalcmsblogspring.errors.InvalidFieldException;
 import mohsen.coder.personalcmsblogspring.errors.NotFoundException;
 import mohsen.coder.personalcmsblogspring.errors.UpdateItemException;
@@ -15,7 +17,6 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,11 +30,14 @@ public class CategoryController {
     private final CreateCategoryUseCase createCategoryUseCase;
     private final GetCategoryUseCase getCategoryUseCase;
     private final UpdateCategoryUseCase updateCategoryUseCase;
+    private final DeleteCategoryUseCase deleteCategoryUseCase;
 
-    public CategoryController(CreateCategoryUseCase createCategoryUseCase, GetCategoryUseCase getCategoryUseCase, UpdateCategoryUseCase updateCategoryUseCase) {
+    public CategoryController(CreateCategoryUseCase createCategoryUseCase, GetCategoryUseCase getCategoryUseCase,
+            UpdateCategoryUseCase updateCategoryUseCase, DeleteCategoryUseCase deleteCategoryUseCase) {
         this.createCategoryUseCase = createCategoryUseCase;
         this.getCategoryUseCase = getCategoryUseCase;
         this.updateCategoryUseCase = updateCategoryUseCase;
+        this.deleteCategoryUseCase = deleteCategoryUseCase;
     }
 
     private void requestValidation(Errors errors) throws InvalidFieldException {
@@ -74,7 +78,7 @@ public class CategoryController {
     @PostMapping(consumes = "application/json")
     public ResponseEntity<CategoryModel> createCategory(@Valid @RequestBody CategoryModel request,
             Errors errors)
-            throws InvalidFieldException, IOException, ConflictException {
+            throws InvalidFieldException, ConflictException {
 
         if (errors.hasErrors()) {
             requestValidation(errors);
@@ -84,16 +88,22 @@ public class CategoryController {
     }
 
     @PutMapping(consumes = "application/json")
-    public ResponseEntity<CategoryModel> updateCategory(@Valid @RequestBody CategoryModel request, Errors errors) throws NotFoundException, UpdateItemException, InvalidFieldException{
-        if(request.getId() == null || request.getId().isEmpty()){
+    public ResponseEntity<CategoryModel> updateCategory(@Valid @RequestBody CategoryModel request, Errors errors)
+            throws NotFoundException, UpdateItemException, InvalidFieldException {
+        if (request.getId() == null || request.getId().isEmpty()) {
             errors.rejectValue("id", "id", "id is required");
         }
 
-        if(errors.hasErrors()){
+        if (errors.hasErrors()) {
             requestValidation(errors);
         }
 
         return updateCategoryUseCase.updateCategory(request.toDomainModel());
+    }
+
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<Object> deleteCategory(@PathVariable("categoryId") String categoryId) throws DeleteItemException {
+        return deleteCategoryUseCase.deleteCategory(categoryId);
     }
 
 }
